@@ -55,6 +55,108 @@
         font-size:1.1rem;
       }
     }
+    #langSelect {
+      background:#fff;
+      border:1px solid #ccc;
+      border-radius:8px;
+      padding:6px 10px;
+      font-size:1rem;
+      color:#333;
+      transition:border-color .2s;
+    }
+    body.dark-mode {
+      background:#181c24;
+      color:#e0e6ef;
+    }
+    body.dark-mode header {
+      background:#222a36 !important;
+      color:#fff;
+      background-image:none !important;
+    }
+    body.dark-mode .card {
+      background:#232a36;
+      color:#e0e6ef;
+      box-shadow:0 14px 30px -5px rgba(15,76,129,0.25);
+    }
+    body.dark-mode #chatbot-section {
+      background:#232a36;
+      border-color:#444e5c;
+      color:#e0e6ef;
+    }
+    body.dark-mode #messages {
+      background:#222a36;
+      border-color:#444e5c;
+      color:#e0e6ef;
+      border:1px solid #444e5c;
+      /* Remove duplicate and conflicting color/background */
+    }
+    body.dark-mode .message .bubble {
+      background:#232a36 !important;
+      color:#e0e6ef !important;
+      border:1px solid #444e5c !important;
+    }
+    body.dark-mode .user .bubble {
+      background:#1fa2ff !important;
+      color:#fff !important;
+      border:1px solid #444e5c !important;
+    }
+    body.dark-mode .bot-typing {
+      color:#e0e6ef !important;
+    }
+    body.dark-mode .sidebar {
+      background:#222a36;
+      color:#fff;
+    }
+    body.dark-mode .sidebar-nav a {
+      color:#fff;
+    }
+    body.dark-mode .sidebar-nav a:hover {
+      background:linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color:#fff;
+    }
+    body.dark-mode .connect-btn {
+      background:linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color:#fff;
+    }
+    body.dark-mode .sidebar-toggle {
+      background:linear-gradient(135deg, #203a43 0%, #2c5364 100%);
+      color:#fff;
+    }
+    body.dark-mode #suggestionButtons .suggestion-btn {
+      background:linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color:#fff;
+    }
+    body.dark-mode #suggestionButtons .suggestion-btn:hover {
+      background:linear-gradient(135deg, #203a43 0%, #2c5364 100%);
+    }
+    body.dark-mode #modalBackground {
+      background:rgba(0,0,0,0.75);
+    }
+    body.dark-mode #modalBox {
+      background:#232a36;
+      color:#e0e6ef;
+      box-shadow:0 28px 60px -10px rgba(15,76,129,0.35);
+    }
+    body.dark-mode form input,
+    body.dark-mode form textarea,
+    body.dark-mode form select {
+      background:#222a36;
+      color:#e0e6ef;
+      border:1px solid #444e5c;
+    }
+    body.dark-mode form button {
+      background:#444e5c;
+      color:#fff;
+    }
+    body.dark-mode #employeeMessages {
+      background:#232a36;
+      border-color:#444e5c;
+      color:#e0e6ef;
+    }
+    body.dark-mode #employeeRatings {
+      color:#2c5364;
+    }
+
     /* When sidebar open: show only short title and align right */
     .compact-title #navbar {
       justify-content:flex-end;
