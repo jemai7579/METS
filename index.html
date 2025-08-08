@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>METS - Page complète avec Chatbot</title>
+  <meta name="description" content="Site de METS avec formulaire, chatbot, et présentation des services." />
+  <style>
+    /* ====== Reset & base ====== */
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body {
+      font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+      background:#f2f8fc;
+      color:#1f2d3a;
+      line-height:1.45;
+      min-height:100vh;
+    }
+    img { max-width:100%; display:block; }
+
+    /* ====== Header ====== */
+    header {
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color:#fff;
+      padding:0;
+      position:sticky;
+      top:0;
+      z-index:100;
+    }
+    #navbar {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      padding:14px 18px;
+      flex-wrap:nowrap;
+      position:relative;
+      transition:justify-content .2s;
+    }
+    #navbar h1 {
+      font-size:1.4rem;
+      margin:0;
+      flex:0 0 auto;
+      min-width:120px;
+    }
+    /* Compact / full title logic */
+    #navbar h1 .short { display:none; }
+    #navbar h1 .full { display:inline; }
+    @media (max-width:600px) {
+      #navbar h1 .full { display:none; }
+      #navbar h1 .short { display:inline; }
+      #navbar {
+        flex-wrap:nowrap;
+        gap:8px;
+      }
+      #navbar > div {
+        flex-shrink:0;
+        display:flex;
+        align-items:center;
+        gap:8px;
+      }
+      #navbar h1 {
+        min-width:unset;
+        font-size:1.1rem;
+      }
+    }
+    /* When sidebar open: show only short title and align right */
+    .compact-title #navbar {
+      justify-content:flex-end;
+      flex-wrap:nowrap;
+    }
+    .compact-title #navbar h1 {
+      text-align:right;
+      width:auto;
+      min-width:unset;
+    }
+    .compact-title #navbar h1 .full { display:none !important; }
+    .compact-title #navbar h1 .short { display:inline !important; }
+
+    /* ====== ... le reste du CSS reste identique ... ====== */
+
+    #navLinks {
+      display:flex;
+      gap:18px;
+      align-items:center;
+      font-size:1.05rem;
+      transition: max-height 0.3s;
+    }
+    #navLinks a {
+      color:#fff;
+      text-decoration:none;
+      padding:7px 14px;
+      border-radius:16px;
+      transition:background 0.2s, color 0.2s;
+      font-weight:500;
+    }
+    #navLinks a:hover {
+      background:#1fa2ff;
+      color:#fff;
+    }
+    #menuToggle {
+      background:none;
+      border:none;
+      cursor:pointer;
+      padding:8px;
+      display:none;
+      flex-direction:column;
+      gap:4px;
+      margin-left:8px;
+    }
+    #menuToggle .bar {
+      display:block;
+      width:26px;
+      height:3px;
+      background:#fff;
+      border-radius:2px;
+      transition:all 0.3s;
+    }
+    @media (max-width:800px){
+      #navLinks {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        background:#0f4c81;
+        flex-direction:column;
+        gap:0;
+        padding:0 18px 12px 18px;
+        max-height:0;
+        overflow:hidden;
+        box-shadow:0 8px 24px -8px rgba(15,76,129,0.18);
+      }
+      #navLinks.open {
+        max-height:300px;
+        padding:12px 18px 18px 18px;
+        gap:10px;
+      }
+      #navLinks a {
+        width:100%;
+        padding:10px 0;
+        border-radius:10px;
+      }
+      #menuToggle {
+        display:flex;
+      }
+    }
+
+    /* Hero, cards, chatbot, modal, sidebar etc. (inchangés) */
+    #hero {
+      background: linear-gradient(135deg, rgba(30,32,38,0.85), rgba(44,46,54,0.85)), url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1350&q=80') center/cover no-repeat;
+      color:#fff;
+      padding:40px 20px;
+      text-align:center;
+    }
+    #hero h1 {
+      font-size:2.6rem;
+      margin-bottom:12px;
+    }
+    #hero p {
+      font-size:1.15rem;
+      max-width:720px;
+      margin:0 auto;
+    }
+
+    main {
+      max-width:1100px;
+      margin:40px auto;
+      padding:0 18px;
+      display:flex;
+      flex-direction:column;
+      gap:60px;
+    }
+    h2 {
+      color:#2c5364;
+      margin-bottom:12px;
+      font-size:1.8rem;
+    }
+    p { margin-bottom:14px; font-size:1rem; }
+
+    .cards-wrapper {
+      display:grid;
+      gap:20px;
+      grid-template-columns: repeat(auto-fit,minmax(260px,1fr));
+    }
+    .card {
+      background:#fff;
+      border-radius:12px;
+      padding:18px 16px;
+      box-shadow:0 14px 30px -5px rgba(15,76,129,0.15);
+      display:flex;
+      flex-direction:column;
+      position:relative;
+      overflow:hidden;
+      transition:transform .25s ease, box-shadow .25s ease;
+    }
+    .card:hover {
+      transform:translateY(-6px);
+      box-shadow:0 22px 40px -5px rgba(15,76,129,0.25);
+    }
+    .card h3 { margin-bottom:8px; font-size:1.25rem; }
+    .card small { display:block; margin-top:6px; color:#555; font-size:.8rem; }
+
+    #chatbot-section {
+      background:#eef6fc;
+      border:1px solid #c5d8ed;
+      border-radius:10px;
+      padding:22px 26px;
+    }
+    #chatbot-section h2 { margin-bottom:8px; }
+    #chatbox {
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    #messages {
+      background:#fff;
+      border:1px solid #b8d1f1;
+      border-radius:8px;
+      padding:14px;
+      min-height:200px;
+      max-height:340px;
+      overflow-y:auto;
+      font-size:.95rem;
+    }
+    .message {
+      margin-bottom:10px;
+      display:flex;
+      gap:10px;
+    }
+    .message .bubble {
+      padding:10px 14px;
+      border-radius:14px;
+      position:relative;
+      max-width:75%;
+      white-space:pre-wrap;
+      word-break:break-word;
+    }
+    .user .bubble {
+      background:#d1e7ff;
+      align-self:flex-end;
+    }
+    .bot .bubble {
+      background:#f4f9ff;
+      align-self:flex-start;
+      border:1px solid #c5d8ed;
+    }
+    #inputRow {
+      display:flex;
+      gap:8px;
+      margin-top:6px;
+    }
+    #userInput {
+      flex:1;
+      padding:10px 14px;
+      border:1px solid #a8c8ec;
+      border-radius:6px;
+      font-size:1rem;
+    }
+    #sendBtn {
+      background:#0f4c81;
+      border:none;
+      padding:10px 18px;
+      color:#fff;
+      font-weight:600;
+      border-radius:6px;
+      cursor:pointer;
+      min-width:100px;
+      transition:filter .2s;
+    }
+    #sendBtn:hover { filter:brightness(1.1); }
+    .bot-typing { font-style:italic; opacity:.7; font-size:.85rem; margin-bottom:6px; }
+
+    #suggestionButtons {
+      margin-top:10px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      justify-content: flex-start;
+    }
+    .suggestion-btn {
+      background: linear-gradient(90deg, #1fa2ff 0%, #0f4c81 100%);
+      color: #fff;
+      border: none;
+      border-radius: 20px;
+      padding: 8px 22px;
+      font-size: 1rem;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(31,162,255,0.10);
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+      outline: none;
+      margin-bottom: 4px;
+    }
+    .suggestion-btn:hover, .suggestion-btn:focus {
+      background: linear-gradient(90deg, #0f4c81 0%, #1fa2ff 100%);
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 6px 18px rgba(31,162,255,0.18);
+    }
+
+    #modalBackground {
+      display:none;
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,0.55);
+      justify-content:center;
+      align-items:center;
+      padding:16px;
+      z-index:500;
+    }
+    #modalBox {
+      background:#fff;
+      border-radius:10px;
+      width:100%;
+      max-width:500px;
+      padding:24px 30px;
+      position:relative;
+      box-shadow:0 28px 60px -10px rgba(15,76,129,0.25);
+    }
+    #closeModal {
+      position:absolute;
+      top:12px;
+      right:14px;
+      font-size:24px;
+      font-weight:700;
+      cursor:pointer;
+      color:#555;
+    }
+    #userTypeSelection {
+      display:flex;
+      gap:18px;
+      justify-content:center;
+      margin-bottom:20px;
+      flex-wrap:wrap;
+    }
+    #userTypeSelection label {
+      cursor:pointer;
+      font-weight:600;
+    }
+    form {
+      display:none;
+    }
+    form.active { display:block; }
+    form label {
+      display:block;
+      margin-bottom:6px;
+      font-weight:600;
+    }
+    form input, form textarea, form select {
+      width:100%;
+      padding:8px 12px;
+      margin-bottom:14px;
+      border:1px solid #bccfe5;
+      border-radius:6px;
+      font-size:1rem;
+      resize:vertical;
+    }
+    form button {
+      background:linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      border:none;
+      padding:12px 16px;
+      color:#fff;
+      border-radius:6px;
+      font-weight:600;
+      cursor:pointer;
+      width:100%;
+      transition:filter .2s;
+    }
+    form button:hover { filter:brightness(1.1); }
+
+    #employeeMessages {
+      background:#e6f0ff;
+      padding:12px;
+      border-radius:6px;
+      border:1px solid #203a43;
+      min-height:100px;
+      margin-bottom:10px;
+      white-space:pre-wrap;
+      max-height:160px;
+      overflow-y:auto;
+      font-size:.9rem;
+    }
+    #employeeRatings {
+      font-weight:600;
+      color:#2c5364;
+    }
+
+    .sidebar {
+      position:fixed;
+      top:0;
+      left:0;
+      width:240px;
+      height:100vh;
+      background:linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color:#fff;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      padding:24px 0 0 0;
+      z-index:1200;
+      box-shadow:0 0 32px rgba(15,76,129,0.10);
+      transition:left 0.3s;
+    }
+    .sidebar.open { left:0; }
+    .sidebar { left:-240px; }
+
+    .sidebar-nav {
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+      width:100%;
+      align-items:center;
+      margin-bottom:32px;
+    }
+    .sidebar-nav a {
+      color:#fff;
+      text-decoration:none;
+      font-size:1.08rem;
+      font-weight:500;
+      padding:8px 0;
+      width:80%;
+      text-align:center;
+      border-radius:10px;
+      transition:background 0.2s, color 0.2s;
+    }
+    .sidebar-nav a:hover {
+      background:linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color:#fff;
+    }
+    .connect-btn {
+      background:linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color:#fff;
+      border:none;
+      border-radius:24px;
+      padding:12px 32px;
+      font-size:1.08rem;
+      font-weight:700;
+      box-shadow:0 4px 16px rgba(31,162,255,0.12);
+      cursor:pointer;
+      margin-top:auto;
+      margin-bottom:32px;
+      transition:background 0.3s, transform 0.2s, box-shadow 0.3s;
+    }
+    .connect-btn:hover, .connect-btn:focus {
+      background:linear-gradient(135deg, #203a43 0%, #2c5364 100%);
+      transform:scale(1.05);
+      box-shadow:0 8px 24px rgba(31,162,255,0.18);
+    }
+
+    .sidebar-toggle {
+      position:fixed;
+      bottom:32px;
+      left:32px;
+      z-index:1300;
+      background:linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color:#fff;
+      border:none;
+      font-size:2.2rem;
+      border-radius:50%;
+      width:56px;
+      height:56px;
+      box-shadow:0 4px 16px rgba(15,76,129,0.12);
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition:background 0.2s, transform 0.2s;
+    }
+    .sidebar-toggle:hover {
+      background:linear-gradient(135deg, #203a43 0%, #2c5364 100%);
+      transform:scale(1.08);
+    }
+    @media (max-width:900px){
+      .sidebar-toggle {
+        left:18px;
+        bottom:18px;
+        width:48px;
+        height:48px;
+        font-size:2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div id="navbar">
+      <h1 style="margin:0;">
+        <span class="short">METS</span>
+        <span class="full">METS - Manufacture Electro-Technique de Sousse</span>
+      </h1>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <select id="langSelect" style="padding:6px 10px;border-radius:8px;border:1px solid #ccc;font-size:1rem;">
+          <option value="fr">Français</option>
+          <option value="en">English</option>
+          <option value="ar">العربية</option>
+        </select>
+        <button id="darkModeBtn" aria-label="Activer le mode sombre" style="background:#fff;color:#2c5364;border:none;padding:7px 14px;border-radius:8px;box-shadow:0 2px 8px rgba(15,76,129,0.10);font-size:1.1rem;cursor:pointer;">🌙</button>
+      </div>
+    </div>
+  </header>
+  <style>
+    body.dark-mode {
+      background:#181c24;
+      color:#e0e6ef;
+    }
+    body.dark-mode header {
+      background:#222a36 !important;
+      color:#fff;
+      background-image:none !important;
+    }
+    body.dark-mode .card {
+      background:#232a36;
+      color:#e0e6ef;
+      box-shadow:0 14px 30px -5px rgba(15,76,129,0.25);
+    }
+    body.dark-mode #chatbot-section {
+      background:#232a36;
+      border-color:#444e5c;
+      color:#e0e6ef;
+    }
+    body.dark-mode #messages {
+      background:#222a36;
+      border-color:#444e5c;
+      color:#e0e6ef;
+      border:1px solid #444e5c;
+      /* Remove duplicate and conflicting color/background */
+    }
+    body.dark-mode .message .bubble {
+      background:#232a36 !important;
+      color:#e0e6ef !important;
+      border:1px solid #444e5c !important;
+    }
+    body.dark-mode .user .bubble {
+      background:#1fa2ff !important;
+      color:#fff !important;
+      border:1px solid #444e5c !important;
+    }
+    body.dark-mode .bot-typing {
+      color:#e0e6ef !important;
+    }
+    body.dark-mode .sidebar {
+      background:#222a36;
+      color:#fff;
+    }
+    body.dark-mode .sidebar-nav a {
+      color:#fff;
+    }
+    body.dark-mode .sidebar-nav a:hover {
+      background:linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color:#fff;
+    }
+    body.dark-mode .connect-btn {
+      background:linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color:#fff;
+    }
+    body.dark-mode .sidebar-toggle {
+      background:linear-gradient(135deg, #203a43 0%, #2c5364 100%);
+      color:#fff;
+    }
+    body.dark-mode #suggestionButtons .suggestion-btn {
+      background:linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color:#fff;
+    }
+    body.dark-mode #suggestionButtons .suggestion-btn:hover {
+      background:linear-gradient(135deg, #203a43 0%, #2c5364 100%);
+    }
+    body.dark-mode #modalBackground {
+      background:rgba(0,0,0,0.75);
+    }
+    body.dark-mode #modalBox {
+      background:#232a36;
+      color:#e0e6ef;
+      box-shadow:0 28px 60px -10px rgba(15,76,129,0.35);
+    }
+    body.dark-mode form input,
+    body.dark-mode form textarea,
+    body.dark-mode form select {
+      background:#222a36;
+      color:#e0e6ef;
+      border:1px solid #444e5c;
+    }
+    body.dark-mode form button {
+      background:#444e5c;
+      color:#fff;
+    }
+    body.dark-mode #employeeMessages {
+      background:#232a36;
+      border-color:#444e5c;
+      color:#e0e6ef;
+    }
+    body.dark-mode #employeeRatings {
+      color:#2c5364;
+    }
+  </style>
+
+  <section id="hero">
+    <div style="position:relative; width:100%; height:300px; overflow:hidden; border-radius:18px;">
+      <video autoplay loop muted playsinline style="width:100%;height:90%;object-fit:cover;">
+        <source src="video.mp4" type="video/mp4">
+        Votre navigateur ne supporte pas la vidéo HTML5.
+      </video>
+      <div style="position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:start;justify-content:center;background:rgba(30,32,38,0.45);">
+        <h1 style="color:#fff;font-size:2.6rem;text-shadow:0 2px 16px #000;">METS - Solutions électrotechniques</h1>
+        <p style="color:#fff;font-size:1.15rem;text-shadow:0 1px 8px #000;max-width:720px;margin:0 auto;">Des équipements sur mesure, maintenance proactive et conseil technique pour des installations fiables et durables.</p>
+      </div>
+    </div>
+  </section>
+
+  <main>
+    <section id="about">
+      <h2>À propos de METS</h2>
+      <p>METS est une entreprise tunisienne spécialisée dans la conception, la fabrication et la maintenance d'équipements électrotechniques adaptés aux besoins industriels. Nous combinons savoir-faire local et standards internationaux pour assurer performance, durabilité et satisfaction.</p>
+      <p>Notre équipe accompagne chaque projet, du dimensionnement à l'intégration, avec un suivi personnalisé.</p>
+    </section>
+
+    <section id="products-services">
+      <h2>Produits & Services</h2>
+      <div class="cards-wrapper">
+        <div class="card">
+          <h3>Produits sur mesure</h3>
+          <p>Câblage, armoires, systèmes de distribution adaptés à votre architecture électrique.</p>
+          <small>Conception selon vos exigences techniques.</small>
+        </div>
+        <div class="card">
+          <h3>Maintenance</h3>
+          <p>Interventions préventives et correctives pour garantir la continuité de service.</p>
+          <small>Contrats personnalisés avec suivi régulier.</small>
+        </div>
+        <div class="card">
+          <h3>Ingénierie & conseil</h3>
+          <p>Audit, optimisation énergétique et solutions pour améliorer l'efficacité globale.</p>
+          <small>Analyse de bout en bout.</small>
+        </div>
+        <div class="card">
+          <h3>Ingénierie & conseil</h3>
+          <p>Audit, optimisation énergétique et solutions pour améliorer l'efficacité globale.</p>
+          <small>Analyse de bout en bout.</small>
+        </div>
+        <div class="card">
+          <h3>Ingénierie & conseil</h3>
+          <p>Audit, optimisation énergétique et solutions pour améliorer l'efficacité globale.</p>
+          <small>Analyse de bout en bout.</small>
+        </div>
+        <div class="card">
+          <h3>Ingénierie & conseil</h3>
+          <p>Audit, optimisation énergétique et solutions pour améliorer l'efficacité globale.</p>
+          <small>Analyse de bout en bout.</small>
+        </div>
+      </div>
+    </section>
+
+    <section id="references">
+      <h2>Nos Références</h2>
+      <div class="cards-wrapper">
+        <div class="card">
+          <h3>Usine agroalimentaire</h3>
+          <p>Automatisation complète avec équipements sur mesure.</p>
+          <small>Réduction des arrêts techniques.</small>
+        </div>
+        <div class="card">
+          <h3>Complexe résidentiel</h3>
+          <p>Distribution électrique sécurisée et conforme.</p>
+          <small>Projet livré dans les délais.</small>
+        </div>
+        <div class="card">
+          <h3>Centrale énergétique</h3>
+          <p>Maintenance continue et supervision.</p>
+          <small>Performance optimale garantie.</small>
+        </div>
+        <div class="card">
+          <h3>Usine textile</h3>
+          <p>Audit énergétique et réingénierie des circuits.</p>
+          <small>Baisse notable de la consommation.</small>
+        </div>
+        <div class="card">
+          <h3>Ingénierie & conseil</h3>
+          <p>Audit, optimisation énergétique et solutions pour améliorer l'efficacité globale.</p>
+          <small>Analyse de bout en bout.</small>
+        </div>
+        <div class="card">
+          <h3>Ingénierie & conseil</h3>
+          <p>Audit, optimisation énergétique et solutions pour améliorer l'efficacité globale.</p>
+          <small>Analyse de bout en bout.</small>
+        </div>
+      </div>
+    </section>
+
+    <section id="chatbot-section">
+      <h2>Assistant Client</h2>
+      <div id="chatbox">
+        <div id="messages" aria-live="polite"></div>
+        <div id="inputRow">
+          <input type="text" id="userInput" placeholder="Ex: prix, maintenance, contact..." aria-label="Question du client" />
+          <button id="sendBtn">Envoyer</button>
+        </div>
+        <div id="suggestionButtons" style="margin-top:10px; display:flex; flex-wrap:wrap; gap:8px;">
+          <button class="suggestion-btn" data-question="prix">Prix</button>
+          <button class="suggestion-btn" data-question="maintenance">Maintenance</button>
+          <button class="suggestion-btn" data-question="contact">Contact</button>
+          <button class="suggestion-btn" data-question="produit">Produit</button>
+          <button class="suggestion-btn" data-question="urgent">Urgent</button>
+          <button class="suggestion-btn" data-question="qualité">Qualité</button>
+          <button class="suggestion-btn" data-question="réclamation">Réclamation</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal login -->
+  <div id="modalBackground" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div id="modalBox">
+      <span id="closeModal" aria-label="Fermer">&times;</span>
+      <h3 id="modalTitle" style="text-align:center; color:#2c5364; margin-bottom:16px;">Connexion</h3>
+
+      <div id="userTypeSelection">
+        <label><input type="radio" name="userType" value="client" /> Client</label>
+        <label><input type="radio" name="userType" value="employee" /> Employé</label>
+      </div>
+
+      <form id="clientForm">
+        <div id="clientChoiceBtns" style="display:none; gap:16px; justify-content:center; margin-bottom:18px;">
+          <button type="button" id="btnFeedback" class="form-choice-btn">Feedback</button>
+          <button type="button" id="btnRequest" class="form-choice-btn">Request for Service</button>
+        </div>
+        <div id="clientFormsWrapper">
+          <!-- Feedback Form -->
+          <form id="feedbackForm" style="display:none;">
+            <div class="form-group">
+              <label for="feedbackName">Nom complet</label>
+              <input type="text" id="feedbackName" required />
+            </div>
+            <div class="form-group">
+              <label for="feedbackEmail">Email</label>
+              <input type="email" id="feedbackEmail" required />
+            </div>
+            <div class="form-group">
+              <label for="feedbackText">Écrire votre feedback</label>
+              <textarea id="feedbackText" rows="3" required></textarea>
+            </div>
+            <div class="form-group">
+              <label for="feedbackRate">Notation (étoiles)</label>
+              <select id="feedbackRate" required>
+                <option value="" disabled selected>Choisissez une note</option>
+                <option value="5">★★★★★ Excellent</option>
+                <option value="4">★★★★ Très bon</option>
+                <option value="3">★★★ Bon</option>
+                <option value="2">★★ Moyen</option>
+                <option value="1">★ À améliorer</option>
+              </select>
+            </div>
+            <button type="submit">Envoyer le feedback</button>
+          </form>
+          <!-- Request for Service Form -->
+          <form id="requestForm" style="display:none;">
+            <div class="form-group">
+              <label for="requestName">Nom complet</label>
+              <input type="text" id="requestName" required />
+            </div>
+            <div class="form-group">
+              <label for="requestEmail">Email</label>
+              <input type="email" id="requestEmail" required />
+            </div>
+            <div class="form-group">
+              <label for="requestService">Décrivez votre besoin</label>
+              <textarea id="requestService" rows="3" required></textarea>
+            </div>
+            <button type="submit">Envoyer la demande</button>
+          </form>
+        </div>
+      </form>
+
+      <form id="employeeForm">
+        <label>Messages des clients :</label>
+        <div id="employeeMessages">Aucun message pour le moment.</div>
+        <label>Notes données par les clients :</label>
+        <div id="employeeRatings">Aucune note pour le moment.</div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Sidebar navigation -->
+  <aside class="sidebar" id="sidebar">
+    <nav class="sidebar-nav">
+      <a href="#hero">Accueil</a>
+      <a href="#products-services">Services</a>
+      <a href="#references">Références</a>
+      <button id="sidebarChatbotLink" class="connect-btn" style="width:80%;margin:0 auto 24px auto;display:block;">Assistant Client</button>
+    </nav>
+    <button id="loginBtnSidebar" class="connect-btn">Se connecter</button>
+  </aside>
+
+  <!-- Bouton toggle sidebar -->
+  <button id="sidebarToggle" class="sidebar-toggle" aria-label="Ouvrir le menu">☰</button>
+  <footer>
+    <p style="text-align:center; color:#555; font-size:0.9rem; margin:20px 0;">&copy; 2023 METS - Tous droits réservés</p>
+  </footer>
+
+  <script>
+    // === Dark mode toggle ===
+    const darkModeBtn = document.getElementById('darkModeBtn');
+    darkModeBtn.addEventListener('click', function(){
+      document.body.classList.toggle('dark-mode');
+      darkModeBtn.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+    });
+
+    // === Language switcher ===
+    const langSelect = document.getElementById('langSelect');
+    const translations = {
+      fr: {
+        heroTitle: "METS - Solutions électrotechniques",
+        heroDesc: "Des équipements sur mesure, maintenance proactive et conseil technique pour des installations fiables et durables.",
+        aboutTitle: "À propos de METS",
+        aboutDesc1: "METS est une entreprise tunisienne spécialisée dans la conception, la fabrication et la maintenance d'équipements électrotechniques adaptés aux besoins industriels. Nous combinons savoir-faire local et standards internationaux pour assurer performance, durabilité et satisfaction.",
+        aboutDesc2: "Notre équipe accompagne chaque projet, du dimensionnement à l'intégration, avec un suivi personnalisé.",
+        productsTitle: "Produits & Services",
+        cards: [
+          {title:"Produits sur mesure",desc:"Câblage, armoires, systèmes de distribution adaptés à votre architecture électrique.",small:"Conception selon vos exigences techniques."},
+          {title:"Maintenance",desc:"Interventions préventives et correctives pour garantir la continuité de service.",small:"Contrats personnalisés avec suivi régulier."},
+          {title:"Ingénierie & conseil",desc:"Audit, optimisation énergétique et solutions pour améliorer l'efficacité globale.",small:"Analyse de bout en bout."}
+        ],
+        referencesTitle: "Nos Références",
+        references: [
+          {title:"Usine agroalimentaire",desc:"Automatisation complète avec équipements sur mesure.",small:"Réduction des arrêts techniques."},
+          {title:"Complexe résidentiel",desc:"Distribution électrique sécurisée et conforme.",small:"Projet livré dans les délais."},
+          {title:"Centrale énergétique",desc:"Maintenance continue et supervision.",small:"Performance optimale garantie."},
+          {title:"Usine textile",desc:"Audit énergétique et réingénierie des circuits.",small:"Baisse notable de la consommation."}
+        ],
+        chatbotTitle: "Assistant Client",
+        chatbotSuggestions: ["Prix", "Maintenance", "Contact", "Produit", "Urgent", "Qualité", "Réclamation"],
+        sidebarMenu: ["Accueil", "Services", "Références", "Assistant Client"],
+        sidebarConnect: "Se connecter"
+      },
+      en: {
+        heroTitle: "METS - Electrotechnical Solutions",
+        heroDesc: "Custom equipment, proactive maintenance and technical advice for reliable and durable installations.",
+        aboutTitle: "About METS",
+        aboutDesc1: "METS is a Tunisian company specializing in the design, manufacture and maintenance of electrotechnical equipment for industrial needs. We combine local expertise and international standards for performance, durability and satisfaction.",
+        aboutDesc2: "Our team supports each project, from sizing to integration, with personalized follow-up.",
+        productsTitle: "Products & Services",
+        cards: [
+          {title:"Custom Products",desc:"Wiring, cabinets, distribution systems adapted to your electrical architecture.",small:"Designed to your technical requirements."},
+          {title:"Maintenance",desc:"Preventive and corrective interventions to ensure service continuity.",small:"Personalized contracts with regular follow-up."},
+          {title:"Engineering & Consulting",desc:"Audit, energy optimization and solutions to improve overall efficiency.",small:"End-to-end analysis."}
+        ],
+        referencesTitle: "Our References",
+        references: [
+          {title:"Food Factory",desc:"Complete automation with custom equipment.",small:"Reduced technical downtime."},
+          {title:"Residential Complex",desc:"Secure and compliant electrical distribution.",small:"Project delivered on time."},
+          {title:"Energy Plant",desc:"Continuous maintenance and supervision.",small:"Optimal performance guaranteed."},
+          {title:"Textile Factory",desc:"Energy audit and circuit reengineering.",small:"Noticeable reduction in consumption."}
+        ],
+        chatbotTitle: "Client Assistant",
+        chatbotSuggestions: ["Price", "Maintenance", "Contact", "Product", "Urgent", "Quality", "Complaint"],
+        sidebarMenu: ["Home", "Services", "References", "Client Assistant"],
+        sidebarConnect: "Login"
+      },
+      ar: {
+        heroTitle: "ميتس - حلول الكهروميكانيك",
+        heroDesc: "معدات مخصصة، صيانة استباقية واستشارات تقنية لتركيبات موثوقة ودائمة.",
+        aboutTitle: "حول ميتس",
+        aboutDesc1: "ميتس هي شركة تونسية متخصصة في تصميم وتصنيع وصيانة المعدات الكهروميكانيكية حسب الاحتياجات الصناعية. نجمع بين الخبرة المحلية والمعايير الدولية لضمان الأداء والمتانة والرضا.",
+        aboutDesc2: "فريقنا يرافق كل مشروع من التحديد إلى الدمج مع متابعة شخصية.",
+        productsTitle: "المنتجات والخدمات",
+        cards: [
+          {title:"منتجات مخصصة",desc:"أسلاك، خزائن، أنظمة توزيع حسب هندستك الكهربائية.",small:"تصميم حسب متطلباتك التقنية."},
+          {title:"الصيانة",desc:"تدخلات وقائية وتصحيحية لضمان استمرارية الخدمة.",small:"عقود مخصصة مع متابعة منتظمة."},
+          {title:"الهندسة والاستشارة",desc:"تدقيق، تحسين الطاقة وحلول لرفع الكفاءة العامة.",small:"تحليل شامل من البداية للنهاية."}
+        ],
+        referencesTitle: "مراجعنا",
+        references: [
+          {title:"مصنع أغذية",desc:"أتمتة كاملة بمعدات مخصصة.",small:"تقليل التوقفات التقنية."},
+          {title:"مجمع سكني",desc:"توزيع كهربائي آمن ومتوافق.",small:"تم تسليم المشروع في الوقت المحدد."},
+          {title:"محطة طاقة",desc:"صيانة مستمرة وإشراف.",small:"ضمان أداء مثالي."},
+          {title:"مصنع نسيج",desc:"تدقيق الطاقة وإعادة هندسة الدوائر.",small:"انخفاض ملحوظ في الاستهلاك."}
+        ],
+        chatbotTitle: "مساعد العملاء",
+        chatbotSuggestions: ["السعر", "الصيانة", "الاتصال", "المنتج", "عاجل", "الجودة", "شكوى"],
+        sidebarMenu: ["الرئيسية", "الخدمات", "المراجع", "مساعد العملاء"],
+        sidebarConnect: "تسجيل الدخول"
+      }
+    };
+
+    function setLanguage(lang) {
+      const t = translations[lang] || translations.fr;
+      document.querySelector('#hero h1').textContent = t.heroTitle;
+      document.querySelector('#hero p').textContent = t.heroDesc;
+      document.querySelector('#about h2').textContent = t.aboutTitle;
+      document.querySelectorAll('#about p')[0].textContent = t.aboutDesc1;
+      document.querySelectorAll('#about p')[1].textContent = t.aboutDesc2;
+      document.querySelector('#products-services h2').textContent = t.productsTitle;
+      const cards = document.querySelectorAll('#products-services .card');
+      t.cards.forEach((c,i)=>{
+        cards[i].querySelector('h3').textContent = c.title;
+        cards[i].querySelector('p').textContent = c.desc;
+        cards[i].querySelector('small').textContent = c.small;
+      });
+      document.querySelector('#references h2').textContent = t.referencesTitle;
+      const refCards = document.querySelectorAll('#references .card');
+      t.references.forEach((c,i)=>{
+        refCards[i].querySelector('h3').textContent = c.title;
+        refCards[i].querySelector('p').textContent = c.desc;
+        refCards[i].querySelector('small').textContent = c.small;
+      });
+      document.querySelector('#chatbot-section h2').textContent = t.chatbotTitle;
+      // Update chatbot suggestion buttons
+      const suggestionBtns = document.querySelectorAll('#suggestionButtons .suggestion-btn');
+      t.chatbotSuggestions.forEach((label,i)=>{
+        if(suggestionBtns[i]) suggestionBtns[i].textContent = label;
+      });
+      // Update sidebar menu links
+      const sidebarLinks = document.querySelectorAll('.sidebar-nav a');
+      t.sidebarMenu.forEach((label,i)=>{
+        if(sidebarLinks[i]) sidebarLinks[i].textContent = label;
+      });
+      // Update sidebar connect button
+      const sidebarConnectBtn = document.getElementById('loginBtnSidebar');
+      if(sidebarConnectBtn) sidebarConnectBtn.textContent = t.sidebarConnect;
+      // Update sidebar chatbot button
+      const sidebarChatbotBtn = document.getElementById('sidebarChatbotLink');
+      if(sidebarChatbotBtn) sidebarChatbotBtn.textContent = t.sidebarMenu[3];
+    }
+    langSelect.addEventListener('change', function(){
+      setLanguage(langSelect.value);
+    });
+    // Initial language
+    setLanguage('fr');
+    // === Sidebar initial state cleanup ===
+    window.addEventListener('DOMContentLoaded', function() {
+      const sidebar = document.getElementById('sidebar');
+      if (sidebar && sidebar.classList.contains('open')) {
+        sidebar.classList.remove('open');
+      }
+      const sidebarToggle = document.getElementById('sidebarToggle');
+      if (sidebarToggle) {
+        sidebarToggle.textContent = '☰';
+        sidebarToggle.setAttribute('aria-label', 'Ouvrir le menu');
+      }
+    });
+
+    // === Modal connexion ===
+    const modalBg = document.getElementById('modalBackground');
+    const closeModalBtn = document.getElementById('closeModal');
+    const userTypeRadios = document.getElementsByName('userType');
+    const clientForm = document.getElementById('clientForm');
+    const employeeForm = document.getElementById('employeeForm');
+    const employeeMessagesDiv = document.getElementById('employeeMessages');
+    const employeeRatingsDiv = document.getElementById('employeeRatings');
+    const loginBtnSidebar = document.getElementById('loginBtnSidebar');
+
+    let clientMessages = [];
+    let clientRatings = [];
+
+    function openModal() {
+      modalBg.style.display = 'flex';
+      resetForms();
+    }
+    if (loginBtnSidebar) {
+      loginBtnSidebar.addEventListener('click', openModal);
+    }
+    closeModalBtn.addEventListener('click', () => modalBg.style.display = 'none');
+    modalBg.addEventListener('click', e => { if (e.target === modalBg) modalBg.style.display = 'none'; });
+
+    function showForm(type){
+      if(type==='client'){
+        clientForm.classList.add('active');
+        employeeForm.classList.remove('active');
+        document.getElementById('clientChoiceBtns').style.display = 'flex';
+        document.getElementById('feedbackForm').style.display = 'none';
+        document.getElementById('requestForm').style.display = 'none';
+      } else if(type==='employee'){
+        employeeForm.classList.add('active');
+        clientForm.classList.remove('active');
+        document.getElementById('clientChoiceBtns').style.display = 'none';
+        document.getElementById('feedbackForm').style.display = 'none';
+        document.getElementById('requestForm').style.display = 'none';
+        updateEmployeeView();
+      }
+    }
+    userTypeRadios.forEach(r => r.addEventListener('change', e => showForm(e.target.value)));
+    function resetForms(){
+      clientForm.classList.remove('active');
+      employeeForm.classList.remove('active');
+      userTypeRadios.forEach(r => r.checked=false);
+      document.getElementById('clientChoiceBtns').style.display = 'none';
+      document.getElementById('feedbackForm').style.display = 'none';
+      document.getElementById('requestForm').style.display = 'none';
+      if(document.getElementById('feedbackForm')) document.getElementById('feedbackForm').reset();
+      if(document.getElementById('requestForm')) document.getElementById('requestForm').reset();
+    }
+    clientForm.addEventListener('submit', e => {
+      e.preventDefault();
+    });
+    function updateEmployeeView(){
+      if(clientMessages.length === 0){
+        employeeMessagesDiv.textContent = 'Aucun message pour le moment.';
+      } else {
+        employeeMessagesDiv.textContent = clientMessages.map((m,i)=> `#${i+1}:\n${m}`).join('\n\n');
+      }
+      if(clientRatings.length === 0){
+        employeeRatingsDiv.textContent = 'Aucune note pour le moment.';
+      } else {
+        const avg = (clientRatings.reduce((a,b)=>a+b,0)/clientRatings.length).toFixed(2);
+        employeeRatingsDiv.textContent = `Nombre d'avis : ${clientRatings.length} – Note moyenne : ${avg} / 5`;
+      }
+    }
+
+    // === Chatbot mot-clés ===
+    // === Gestion des choix client ===
+    const btnFeedback = document.getElementById('btnFeedback');
+    const btnRequest = document.getElementById('btnRequest');
+    const feedbackForm = document.getElementById('feedbackForm');
+    const requestForm = document.getElementById('requestForm');
+    if(btnFeedback && btnRequest){
+      btnFeedback.addEventListener('click', function(){
+        feedbackForm.style.display = 'block';
+        requestForm.style.display = 'none';
+      });
+      btnRequest.addEventListener('click', function(){
+        feedbackForm.style.display = 'none';
+        requestForm.style.display = 'block';
+      });
+    }
+
+    if(feedbackForm){
+      feedbackForm.addEventListener('submit', function(e){
+        e.preventDefault();
+        const name = document.getElementById('feedbackName').value.trim();
+        const email = document.getElementById('feedbackEmail').value.trim();
+        const text = document.getElementById('feedbackText').value.trim();
+        const rate = parseInt(document.getElementById('feedbackRate').value);
+        if(!name || !email || !text || !rate){
+          alert('Veuillez remplir tous les champs.');
+          return;
+        }
+        clientMessages.push(`Nom: ${name}\nEmail: ${email}\nFeedback: ${text}`);
+        clientRatings.push(rate);
+        alert('Feedback envoyé, merci !');
+        feedbackForm.reset();
+        feedbackForm.style.display = 'none';
+        document.getElementById('clientChoiceBtns').style.display = 'flex';
+        updateEmployeeView();
+      });
+    }
+    if(requestForm){
+      requestForm.addEventListener('submit', function(e){
+        e.preventDefault();
+        const name = document.getElementById('requestName').value.trim();
+        const email = document.getElementById('requestEmail').value.trim();
+        const service = document.getElementById('requestService').value.trim();
+        if(!name || !email || !service){
+          alert('Veuillez remplir tous les champs.');
+          return;
+        }
+        clientMessages.push(`Nom: ${name}\nEmail: ${email}\nDemande: ${service}`);
+        alert('Demande envoyée, merci !');
+        requestForm.reset();
+        requestForm.style.display = 'none';
+        document.getElementById('clientChoiceBtns').style.display = 'flex';
+        updateEmployeeView();
+      });
+    }
+
+    const userInput = document.getElementById('userInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const messagesDiv = document.getElementById('messages');
+
+    const knowledgeBase = [
+      {
+        keywords: ['prix', 'tarif', 'devis', 'coût'],
+        response: "Pour obtenir un devis, remplissez le formulaire client avec votre besoin précis. Vous voulez que je vous l'ouvre ?"
+      },
+      {
+        keywords: ['maintenance', 'réparation', 'support'],
+        response: "Nous offrons des contrats de maintenance préventive et corrective. Souhaitez-vous une estimation ?"
+      },
+      {
+        keywords: ['contact', 'joindre', 'appel', 'email'],
+        response: "Vous pouvez nous contacter via le formulaire client. Voulez-vous que je l'affiche ?"
+      },
+      {
+        keywords: ['produit', 'offre', 'service'],
+        response: "Nous proposons : produits sur mesure, maintenance et ingénierie. Laquelle vous intéresse ?"
+      },
+      {
+        keywords: ['urgent', 'immédiat', 'rapidement'],
+        response: "Je peux marquer votre demande comme urgente ; décrivez brièvement ce qu'il faut faire."
+      },
+      {
+        keywords: ['qualité', 'normes', 'fiabilité'],
+        response: "Nos équipements respectent les normes internationales et passent des contrôles qualité stricts."
+      },
+      {
+        keywords: ['réclamation', 'problème', 'insatisfaction'],
+        response: "Désolé pour la gêne. Décrivez votre souci, je peux générer une fiche ou transmettre au support."
+      }
+    ];
+
+    function addMessage(text, sender='bot'){
+      const wrapper = document.createElement('div');
+      wrapper.classList.add('message', sender);
+      const bubble = document.createElement('div');
+      bubble.classList.add('bubble');
+      bubble.textContent = text;
+      wrapper.appendChild(bubble);
+      messagesDiv.appendChild(wrapper);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    function detectAnswer(input){
+      const sanitized = input.toLowerCase();
+      for(const item of knowledgeBase){
+        for(const kw of item.keywords){
+          if(sanitized.includes(kw)){
+            return item.response;
+          }
+        }
+      }
+      return null;
+    }
+
+    function botReply(userText){
+      const typing = document.createElement('div');
+      typing.className='bot-typing';
+      typing.textContent='Le chatbot réfléchit...';
+      messagesDiv.appendChild(typing);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+      setTimeout(() => {
+        typing.remove();
+        const answer = detectAnswer(userText);
+        if(answer){
+          addMessage(answer, 'bot');
+        } else {
+          addMessage("Désolé, je n'ai pas compris. Voulez-vous que je vous mette en relation avec un conseiller humain ?", 'bot');
+        }
+      }, 600);
+    }
+
+    sendBtn.addEventListener('click', () => {
+      const text = userInput.value.trim();
+      if(!text) return;
+      addMessage(text, 'user');
+      userInput.value='';
+      botReply(text);
+    });
+
+    userInput.addEventListener('keypress', e => {
+      if(e.key === 'Enter'){
+        sendBtn.click();
+      }
+    });
+
+    document.querySelectorAll('.suggestion-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const question = btn.getAttribute('data-question');
+        addMessage(question, 'user');
+        botReply(question);
+      });
+    });
+
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        addMessage("Bonjour ! Comment puis-je vous aider aujourd'hui ? Vous pouvez demander sur les prix, la maintenance, le contact, etc.", 'bot');
+      }, 400);
+    });
+
+    // === Sidebar toggle logic with title behavior ===
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    sidebarToggle.addEventListener('click', () => {
+      const isOpen = sidebar.classList.toggle('open');
+      sidebarToggle.textContent = isOpen ? '×' : '☰';
+      sidebarToggle.setAttribute('aria-label', isOpen ? 'Fermer le menu' : 'Ouvrir le menu');
+      if (isOpen) {
+        document.body.classList.add('compact-title');
+      } else {
+        document.body.classList.remove('compact-title');
+      }
+    });
+    window.addEventListener('click', function(e){
+      if(sidebar.classList.contains('open')){
+        if(!sidebar.contains(e.target) && e.target !== sidebarToggle){
+          sidebar.classList.remove('open');
+          sidebarToggle.textContent = '☰';
+          sidebarToggle.setAttribute('aria-label', 'Ouvrir le menu');
+          document.body.classList.remove('compact-title');
+        }
+      }
+    });
+
+    // Scroll vers la section Assistant Client quand on clique dans la sidebar
+    const sidebarChatbotLink = document.getElementById('sidebarChatbotLink');
+    sidebarChatbotLink.addEventListener('click', function(e){
+      e.preventDefault();
+      sidebar.classList.remove('open');
+      sidebarToggle.textContent = '☰';
+      sidebarToggle.setAttribute('aria-label', 'Ouvrir le menu');
+      document.body.classList.remove('compact-title');
+      document.getElementById('chatbot-section').scrollIntoView({behavior: 'smooth'});
+    });
+  </script>
+</body>
+</html>
